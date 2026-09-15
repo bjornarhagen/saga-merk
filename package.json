@@ -1,0 +1,14 @@
+{
+  "name": "saga-merk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A lightweight browser bookmarklet for visual feedback and layout annotations.",
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "test": "node --check src/saga-merk.js && node tests/interactions.cjs",
+    "check": "npm test && npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
