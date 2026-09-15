@@ -1,0 +1,43 @@
+name: Build and publish
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  container:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: npm run check
+      - name: Check generated files are current
+        run: git diff --exit-code -- index.html dist/
+      - name: Build container
+        run: docker build -t saga-merk:ci .
+      - name: Verify container
+        run: python3 scripts/check-container.py saga-merk:ci
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish tested image
+        if: github.event_name != 'pull_request'
+        env:
+          IMAGE: ghcr.io/${{ github.repository }}
+          REVISION: ${{ github.sha }}
+        run: |
+          docker tag saga-merk:ci "$IMAGE:sha-$REVISION"
+          docker push "$IMAGE:sha-$REVISION"
+          reference=$(docker image inspect "$IMAGE:sha-$REVISION" --format '{{index .RepoDigests 0}}')
+          printf 'Published immutable image: %s\n' "$reference" >> "$GITHUB_STEP_SUMMARY"
