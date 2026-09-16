@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build.cjs",
     "test": "node --check src/saga-merk.js && node tests/interactions.cjs",
-    "check": "npm test && npm run build"
+    "check": "npm test && npm run build && node tests/bookmarklet.cjs"
   },
   "engines": {
     "node": ">=18"

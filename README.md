@@ -19,14 +19,14 @@ The installer includes a demo. GitHub's file preview does not execute the instal
 | Key | Tool | Use |
 | --- | --- | --- |
 | 1 | Select | Select marks or page elements; use floating controls to move, edit text, or delete page elements |
-| 2 | Vertical | Click or drag a full-height guide; Alt/Option adds a mirrored guide |
-| 3 | Horizontal | Click or drag a full-width guide; Alt/Option adds a mirrored guide |
-| 4 | Circle | Drag an ellipse; Shift for a circle; Alt/Option to draw from the center |
-| 5 | Arrow | Drag an arrow; hold Shift to snap its direction |
-| 6 | Text | Click to type; drag a box to move, double-click to edit |
-| 7 | Browse | Interact with the underlying page |
-| 8 | Counter | Click or drag to place the next number |
-| 0 | Rectangle | Drag a rectangle; Shift for a square; Alt/Option to draw from the center |
+| 2 | Counter | Click or drag to place the next number |
+| 3 | Text | Click to type; drag a box to move, double-click to edit |
+| 4 | Horizontal | Click or drag a full-width guide; Alt/Option adds a mirrored guide |
+| 5 | Vertical | Click or drag a full-height guide; Alt/Option adds a mirrored guide |
+| 6 | Arrow | Drag an arrow; hold Shift to snap its direction |
+| 7 | Rectangle | Drag a rectangle; Shift for a square; Alt/Option to draw from the center |
+| 8 | Circle | Drag an ellipse; Shift for a circle; Alt/Option to draw from the center |
+| 9 | Browse | Interact with the underlying page |
 
 - The website link at the bottom of the toolbar opens the installer in a new tab.
 - The toolbar opens in the bottom-right corner. Drag the **SAGA MERK** header to move it.
@@ -48,7 +48,7 @@ The installer includes a demo. GitHub's file preview does not execute the instal
 
 Default spacing: **32 px**. Options: 8, 16, 24, 32, 64, and 128 px.
 
-Horizontal and vertical margins both start at **32 px**. Adjustments show live grid width and height, which fade after a pause.
+Horizontal and vertical margins both start at **16 px**. Adjustments show live grid width and height, which fade after a pause.
 
 - Arrow keys: 8 px steps.
 - Shift + arrow keys: 1 px steps.
@@ -79,3 +79,5 @@ Saga Merk does not capture screenshots or send page content anywhere; use your n
 ## Website design
 
 The installer shares the blackletter typography, terminal-inspired layout and floral ASCII header artwork of [bjornar.dev](https://bjornar.dev), reused with the owner’s permission. Fonts and header images are served locally from `assets/`. The website supports dark/light themes and respects reduced motion. Website assets are separate from the self-contained bookmarklet.
+
+The build keeps the self-contained bookmarklet URL below Firefox’s 65,536-character bookmark limit and checks that the installer link and manual-install code decode to the exact source. URL-safe punctuation stays literal to avoid unnecessary size growth.
