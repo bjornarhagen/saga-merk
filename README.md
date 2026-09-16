@@ -25,12 +25,18 @@ The installer includes a demo. GitHub's file preview does not execute the instal
 | 5 | Arrow | Drag an arrow; hold Shift to snap its direction |
 | 6 | Text | Click to type; drag a box to move, double-click to edit |
 | 7 | Browse | Interact with the underlying page |
+| 8 | Counter | Click or drag to place the next number |
+| 9 | Edit page | Click existing page text to edit its content, color, and size |
 
 - Drag the **SAGA MERK** header to move the frosted-glass toolbar.
+- **Counter** starts at 1 and continues after the highest remaining number. Undo reuses the removed number; Clear restarts at 1.
+- **Text size** sets the size for new text and counters and resizes a selected text or counter annotation.
 - Pick red, green, blue, or a custom color. A selected mark adopts color changes.
+- **Edit page** makes clicked page text editable. The style controls apply to that text while editing, including when you focus the toolbar. Click elsewhere to finish. Existing form fields and editors keep their normal behavior; use Browse to follow links.
+- Page edits are a temporary local preview. Switching tools or hiding the toolbar keeps them visible. **Undo** reverts edits; **Clear** or closing Saga Merk restores the original page text and styles. Refreshing also discards edits.
 - **H** hides the toolbar and enters Browse mode. Press H again to restore your previous tool.
 - **Escape** asks before closing and discarding annotations. The close button and reopening the bookmark also ask.
-- **Delete/Backspace** removes a selected mark. **Cmd/Ctrl+Z** undoes annotation changes outside Browse mode. While editing text, the browser handles text undo.
+- **Delete/Backspace** removes a selected mark. **Cmd/Ctrl+Z** undoes annotation changes outside Browse mode. While typing in an annotation or page text, the browser handles text undo; the toolbar’s Undo button reverts the completed edit.
 - Tool and hide shortcuts do not interrupt typing in input fields.
 
 ### Grid
@@ -55,9 +61,11 @@ npm run check
 
 Edit `src/saga-merk.js` for the overlay and `src/installer.html` for installation instructions. Run `npm run build` to regenerate `index.html` and `dist/`. Commit generated files so the download works immediately.
 
-Tests exercise interaction logic using a small DOM substitute: drawing, movement, editable text, history, grid settings, shortcuts, toolbar positioning, and cleanup. They do not verify browser rendering or native number-input behavior. Use the installer demo for visual testing.
+Tests exercise interaction logic using a small DOM substitute: drawing, movement, editable text, page editing and restoration, history, grid settings, shortcuts, toolbar positioning, and cleanup. They do not verify browser rendering or native number-input behavior. Use the installer demo for visual testing.
 
 ## Limitations
+
+Page editing works on regular HTML text in the current document; text inside iframes, closed shadow roots, and canvas is not supported. Sites that redraw their content may overwrite local edits.
 
 Annotations are temporary and fixed to the viewport. Refreshing or closing clears them. Browser-internal pages, some PDF viewers, and sites with restrictive security policies may block bookmarklets. Browser bookmark storage and synchronization limits vary.
 

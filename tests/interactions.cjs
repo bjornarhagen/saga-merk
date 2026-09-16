@@ -1,23 +1,41 @@
 const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');
+class Style {
+  constructor(){this.values={};this.priorities={};}
+  getPropertyValue(name){return this.values[name]||'';}
+  getPropertyPriority(name){return this.priorities[name]||'';}
+  setProperty(name,value,priority=''){this.values[name]=value;this.priorities[name]=priority;}
+  removeProperty(name){delete this.values[name];delete this.priorities[name];}
+}
+class TextNode {
+  constructor(data){this.nodeType=3;this.data=data;this.childNodes=[];}
+  get textContent(){return this.data;}
+}
 class El {
-  constructor(tag='div'){this.tagName=tag;this.dataset={};this.style={};this.attrs={};this.children=[];this.handlers={};this.value='';this.classes=new Set();this.classList={toggle:(k,on)=>{on=on??!this.classes.has(k);on?this.classes.add(k):this.classes.delete(k);return on;},add:k=>this.classes.add(k),remove:k=>this.classes.delete(k),contains:k=>this.classes.has(k)};}
+  constructor(tag='div'){this.tagName=tag;this.nodeType=1;this.namespaceURI='http://www.w3.org/1999/xhtml';this.dataset={};this.style=new Style();this.attrs={};this.children=[];this.handlers={};this.value='';this.classes=new Set();this.classList={toggle:(k,on)=>{on=on??!this.classes.has(k);on?this.classes.add(k):this.classes.delete(k);return on;},add:k=>this.classes.add(k),remove:k=>this.classes.delete(k),contains:k=>this.classes.has(k)};}
+  get childNodes(){return this.children;}
+  get textContent(){return this.children.map(child=>child.textContent).join('');}
+  set textContent(value){this.replaceChildren(new TextNode(value));}
+  get innerHTML(){return this.children.map(child=>child.nodeType===3?child.data:`<${child.tagName}>${child.innerHTML}</${child.tagName}>`).join('');}
+  getAttribute(name){return this.attrs[name]??null;}
+  removeAttribute(name){delete this.attrs[name];}
+  contains(el){return el===this||this.children.some(child=>child===el||child.contains?.(el));}
   focus(){this.focused=true;this.emit('focus');}blur(){if(this.focused){this.focused=false;this.emit('blur');}}
   get scrollHeight(){return Math.max(32,(this.value||'').split('\n').length*24);}
   getBoundingClientRect(){return {left:parseFloat(this.style.left)||120,top:parseFloat(this.style.top)||16,width:760,height:200};}
   setAttribute(k,v){this.attrs[k]=String(v);if(k==='data-id')this.dataset.id=String(v);}
   append(...els){this.children.push(...els);els.forEach(el=>el.parent=this);}
-  replaceChildren(){this.children=[];}
+  replaceChildren(...els){this.children=[];this.append(...els);}
   remove(){if(this.parent)this.parent.children=this.parent.children.filter(x=>x!==this);}
   addEventListener(k,fn){(this.handlers[k]??=[]).push(fn);}
   removeEventListener(k,fn){this.handlers[k]=(this.handlers[k]||[]).filter(f=>f!==fn);}
-  emit(k,event={}){for(const f of this.handlers[k]||[])f({preventDefault(){},stopPropagation(){},...event});}
-  closest(q){return q==='button'&&this.tagName==='button'?this:q==='[data-id]'?(this.dataset.id?this:this.parent?.closest(q)):null;}
+  emit(k,event={}){for(const f of this.handlers[k]||[])f({preventDefault(){},stopPropagation(){},stopImmediatePropagation(){},...event});}
+  closest(q){if(q.includes(','))return q.split(',').some(selector=>selector==='[contenteditable]'?this.getAttribute('contenteditable')!==null:this.tagName.toLowerCase()===selector)?this:this.parent?.closest(q)||null;return q==='button'&&this.tagName==='button'?this:q==='[data-id]'?(this.dataset.id?this:this.parent?.closest(q)):null;}
   setPointerCapture(id){this.capture=id;}hasPointerCapture(id){return this.capture===id;}releasePointerCapture(){this.capture=null;}
-  attachShadow(){root=new El();root.svg=new El('svg');root.texts=new El();root.grid=new El();root.spacing=new El('select');root.spacing.value='32';root.dimensions=new El();root.dimensionWidth=new El();root.dimensionHeight=new El();root.marginX=new El('input');root.marginX.value='32';root.marginY=new El('input');root.marginY.value='32';root.handle=new El('button');root.bar=new El();root.color=new El('input');root.color.value='#ff263f';root.width=new El('select');root.width.value='2';root.buttons=[];for(const mode of ['select','v','h','circle','arrow','text','browse']){let b=new El('button');b.dataset.mode=mode;root.buttons.push(b);}for(const color of ['#ff263f','#16a34a','#2563eb']){let b=new El('button');b.dataset.color=color;root.buttons.push(b);}for(const action of ['grid','undo','delete','clear','hide','close']){let b=new El('button');b.dataset.action=action;root.buttons.push(b);}return root;}
-  querySelector(q){return q==='.dimensions'?this.dimensions:q==='.dimension-width'?this.dimensionWidth:q==='.dimension-height'?this.dimensionHeight:q==='.texts'?this.texts:q==='.grid'?this.grid:q==='[data-grid-spacing]'?this.spacing:q==='[data-grid-margin-x]'?this.marginX:q==='[data-grid-margin-y]'?this.marginY:q==='.drag-handle'?this.handle:q==='svg'?this.svg:q==='.bar'?this.bar:q==='input'?this.color:q==='select'?this.width:this.buttons.find(b=>q===`[data-action="${b.dataset.action}"]`);}
+  attachShadow(){root=new El();root.hint=new El();root.hint.textContent='Default hint';root.svg=new El('svg');root.texts=new El();root.grid=new El();root.spacing=new El('select');root.spacing.value='32';root.dimensions=new El();root.dimensionWidth=new El();root.dimensionHeight=new El();root.marginX=new El('input');root.marginX.value='32';root.marginY=new El('input');root.marginY.value='32';root.handle=new El('button');root.bar=new El();root.color=new El('input');root.color.value='#ff263f';root.width=new El('select');root.width.value='2';root.textSize=new El('select');root.textSize.value='16';root.buttons=[];for(const mode of ['select','v','h','circle','arrow','text','browse','counter','page']){let b=new El('button');b.dataset.mode=mode;root.buttons.push(b);}for(const color of ['#ff263f','#16a34a','#2563eb']){let b=new El('button');b.dataset.color=color;root.buttons.push(b);}for(const action of ['grid','undo','delete','clear','hide','close']){let b=new El('button');b.dataset.action=action;root.buttons.push(b);}return root;}
+  querySelector(q){if(q.includes(','))return this.children.find(child=>child.nodeType===1&&child.closest(q)===child)||null;return q==='.hint'?this.hint: q==='[data-text-size]'?this.textSize:q==='.dimensions'?this.dimensions:q==='.dimension-width'?this.dimensionWidth:q==='.dimension-height'?this.dimensionHeight:q==='.texts'?this.texts:q==='.grid'?this.grid:q==='[data-grid-spacing]'?this.spacing:q==='[data-grid-margin-x]'?this.marginX:q==='[data-grid-margin-y]'?this.marginY:q==='.drag-handle'?this.handle:q==='svg'?this.svg:q==='.bar'?this.bar:q==='input'?this.color:q==='select'?this.width:this.buttons.find(b=>q===`[data-action="${b.dataset.action}"]`);}
   querySelectorAll(q){return this.buttons.filter(b=>q==='[data-mode]'?b.dataset.mode:b.dataset.color);}
 }
-let root;const document=new El();document.documentElement=new El();document.createElement=t=>new El(t);document.createElementNS=(_,t)=>new El(t);const window=new El();let confirmResult=false;const prompts=[];window.confirm=message=>{prompts.push(message);return confirmResult;};let timerId=0;const timers=new Map();window.setTimeout=fn=>{timers.set(++timerId,fn);return timerId;};window.clearTimeout=id=>timers.delete(id);window.innerWidth=1200;window.innerHeight=800;vm.runInNewContext(fs.readFileSync('src/saga-merk.js','utf8'),{window,document,Element:El});
+let root;const document=new El();document.documentElement=new El();document.createElement=t=>new El(t);document.createElementNS=(_,t)=>new El(t);const window=new El();let confirmResult=false;const prompts=[];window.confirm=message=>{prompts.push(message);return confirmResult;};let timerId=0;const timers=new Map();window.setTimeout=fn=>{timers.set(++timerId,fn);return timerId;};window.clearTimeout=id=>timers.delete(id);window.getComputedStyle=el=>({color:el.style.getPropertyValue('color')||'rgb(20, 30, 40)',fontSize:el.style.getPropertyValue('font-size')||'18px'});window.innerWidth=1200;window.innerHeight=800;vm.runInNewContext(fs.readFileSync('src/saga-merk.js','utf8'),{window,document,Element:El});
 const svg=root.svg,click=(type,v)=>root.bar.emit('click',{target:root.buttons.find(b=>b.dataset[type]===v)});
 const pointer=(event,x,y,target=svg,extra={})=>svg.emit(event,{clientX:x,clientY:y,pointerId:1,button:0,target,...extra});
 const ink=i=>svg.children[i].children[0].attrs;
@@ -89,6 +107,25 @@ editor.focus();editor.blur();click('color','#16a34a');assert.equal(box.style.col
 click('action','hide');assert(root.texts.classes.has('clean'));click('action','hide');
 click('mode','select');editor.focus();editor.blur();click('action','delete');assert.equal(root.texts.children.length,0);click('action','undo');assert.equal(root.texts.children.length,1);assert.equal(root.texts.children[0].children[0].value,'First line\nSecond line');
 click('mode','browse');assert(root.texts.classes.has('pass'));click('action','clear');assert.equal(root.texts.children.length,0);click('action','undo');assert.equal(root.texts.children.length,1);
+// Counters place on click or drag, share text styling, and restore numbering on undo/cancel.
+click('action','clear');click('mode','counter');
+root.textSize.value='24';root.textSize.emit('change');
+pointer('pointerdown',100,300);pointer('pointerup',100,300);
+let counter=root.texts.children[0];
+assert.equal(counter.children[0].value,'1');assert.equal(counter.children[0].style.fontSize,'24px');assert(!counter.children[0].focused);
+pointer('pointerdown',200,300);pointer('pointermove',220,350);pointer('pointerup',240,360);
+assert.equal(root.texts.children[1].children[0].value,'2');assert.equal(root.texts.children[1].style.left,'240px');assert.equal(root.texts.children[1].style.top,'360px');
+pointer('pointerdown',300,300);svg.emit('pointercancel');assert.equal(root.texts.children.length,2);
+pointer('pointerdown',300,300);pointer('pointerup',300,300);assert.equal(root.texts.children[2].children[0].value,'3');
+click('action','undo');pointer('pointerdown',310,310);pointer('pointerup',310,310);assert.equal(root.texts.children[2].children[0].value,'3');
+root.textSize.value='48';root.textSize.emit('change');assert.equal(root.texts.children[2].children[0].style.fontSize,'48px');assert.equal(counter.children[0].style.fontSize,'24px');
+click('action','undo');assert.equal(root.texts.children[2].children[0].style.fontSize,'24px');
+counter.emit('dblclick');assert.equal(counter.children[0].readOnly,true);
+counter.emit('pointerdown',{button:0,pointerId:9,clientX:100,clientY:300});root.texts.emit('pointerup',{pointerId:9,clientX:150,clientY:340});assert.equal(counter.style.left,'150px');assert.equal(root.textSize.value,'24');
+click('color','#2563eb');assert.equal(counter.style.color,'#2563eb');click('action','delete');assert.equal(root.texts.children.length,2);click('action','undo');assert.equal(root.texts.children.length,3);
+click('mode','text');pointer('pointerdown',400,400);let sizedText=root.texts.children[3].children[0];assert.equal(sizedText.style.fontSize,'24px');sizedText.value='Sized note';sizedText.emit('input');sizedText.blur();
+root.textSize.value='32';root.textSize.emit('change');assert.equal(sizedText.style.fontSize,'32px');click('action','undo');assert.equal(sizedText.style.fontSize,'24px');
+click('action','clear');click('mode','counter');pointer('pointerdown',100,300);pointer('pointerup',100,300);assert.equal(root.texts.children[0].children[0].value,'1');
 // Cancelled close keeps content, including when Escape comes from an editor.
 const escape=(target=svg,repeat=false)=>document.emit('keydown',{key:'Escape',repeat,composedPath:()=>[target]});
 escape(root.texts.children[0].children[0]);assert.equal(document.documentElement.children.length,1);assert.equal(root.texts.children.length,1);assert.match(prompts.at(-1),/discard/);assert.match(prompts.at(-1),/press H/);
@@ -100,11 +137,39 @@ click('mode','arrow');document.emit('keydown',{key:'h',composedPath:()=>[svg]});
 document.emit('keydown',{key:'h',composedPath:()=>[svg]});assert(!root.bar.classes.has('hidden'));assert(!svg.classes.has('pass'));assert.equal(root.buttons.find(b=>b.dataset.mode==='arrow').attrs['aria-pressed'],'true');assert.equal(root.texts.children.length,1);
 for(const tool of ['text','select','v','h','circle','browse']){click('mode',tool);click('action','hide');assert(svg.classes.has('pass'));click('action','hide');assert.equal(root.buttons.find(b=>b.dataset.mode===tool).attrs['aria-pressed'],'true');assert.equal(svg.classes.has('pass'),tool==='browse');}
 // Number keys select each tool and leave typing, composition, and browser chords alone.
-for(const [index,tool] of ['select','v','h','circle','arrow','text','browse'].entries()){
+for(const [index,tool] of ['select','v','h','circle','arrow','text','browse','counter','page'].entries()){
   document.emit('keydown',{key:String(index+1),composedPath:()=>[svg]});assert.equal(root.buttons.find(b=>b.dataset.mode===tool).attrs['aria-pressed'],'true');
 }
+click('mode','browse');
 for(const target of [{tagName:'INPUT'},{tagName:'TEXTAREA'},{tagName:'SELECT'},{isContentEditable:true}]){document.emit('keydown',{key:'1',composedPath:()=>[target]});assert(svg.classes.has('pass'));}
 for(const modifier of ['metaKey','ctrlKey','altKey','shiftKey','isComposing']){document.emit('keydown',{key:'1',[modifier]:true,composedPath:()=>[svg]});assert(svg.classes.has('pass'));}
 click('action','hide');document.emit('keydown',{key:'6',composedPath:()=>[svg]});assert(!root.bar.classes.has('hidden'));assert.equal(root.buttons.find(b=>b.dataset.mode==='text').attrs['aria-pressed'],'true');
-confirmResult=true;escape();assert.equal(document.documentElement.children.length,0);assert.equal(document.handlers.keydown.length,0);assert.equal(window.handlers.resize.length,0);
-console.log('PASS: text creation/editing/moving/colors/undo/delete, independent grid margins, toolbar dragging/clamping/resize/keyboard, guide placement, shape selection/movement, constrained guides/circles, arrows, colors, cancellation, undo/delete/clear, browse, hiding, cleanup.');
+// Edit page targets real text, preserves nested nodes, and keeps toolbar styling scoped.
+const heading=new El('H1'),emphasis=new El('EM');emphasis.textContent='world';heading.append(new TextNode('Hello '),emphasis);
+heading.style.setProperty('color','rgb(20, 30, 40)','important');heading.style.setProperty('outline','1px dashed black');
+const originalHeading=heading.innerHTML,annotationColor=root.color.value,annotationSize=root.textSize.value;
+const pageEvent=(type,target,extra={})=>document.emit(type,{button:0,target,composedPath:()=>[target],...extra});
+click('mode','page');assert(svg.classes.has('pass'));assert(root.texts.classes.has('pass'));
+pageEvent('pointerdown',heading);assert.equal(heading.getAttribute('contenteditable'),'plaintext-only');assert.equal(root.color.value,'#141e28');assert.equal(root.textSize.value,'18');assert.equal(root.hint.textContent.includes('Editing page text'),true);
+// Toolbar focus doesn't lose the page target; changing style never recolors an annotation.
+pageEvent('focusin',root.color,{composedPath:()=>[root.color,window.__pageMarkerOverlay]});
+click('color','#16a34a');assert.equal(heading.style.getPropertyValue('color'),'#16a34a');assert.equal(root.texts.children[0].style.color,'#2563eb');
+root.textSize.value='32';root.textSize.emit('change');assert.equal(heading.style.getPropertyValue('font-size'),'32px');
+heading.textContent='New heading';pageEvent('input',heading);
+let pageKeyStopped=false;pageEvent('keydown',heading,{key:'8',stopImmediatePropagation(){pageKeyStopped=true;}});assert(pageKeyStopped);assert.equal(root.buttons.find(b=>b.dataset.mode==='page').attrs['aria-pressed'],'true');
+let navigationBlocked=false;pageEvent('click',heading,{preventDefault(){navigationBlocked=true;}});assert(navigationBlocked);
+click('action','undo');assert.equal(heading.innerHTML,originalHeading);assert.equal(heading.children[1],emphasis);assert.equal(heading.getAttribute('contenteditable'),null);assert.equal(heading.style.getPropertyValue('font-size'),'32px');assert.equal(heading.style.getPropertyValue('outline'),'1px dashed black');
+click('action','undo');assert.equal(heading.style.getPropertyValue('font-size'),'');click('action','undo');assert.equal(heading.style.getPropertyValue('color'),'rgb(20, 30, 40)');assert.equal(heading.style.getPropertyPriority('color'),'important');
+assert.equal(root.color.value,annotationColor);assert.equal(root.textSize.value,annotationSize);
+// Blur commits; hide and tool switches end editing while preserving the visible result.
+pageEvent('pointerdown',heading);heading.textContent='Local preview';pageEvent('input',heading);pageEvent('focusin',new El('INPUT'));assert.equal(heading.getAttribute('contenteditable'),null);assert.equal(heading.textContent,'Local preview');
+pageEvent('pointerdown',heading);click('action','hide');assert.equal(heading.getAttribute('contenteditable'),null);assert.equal(heading.textContent,'Local preview');click('action','hide');assert.equal(root.buttons.find(b=>b.dataset.mode==='page').attrs['aria-pressed'],'true');
+// Existing form fields, editors and layout containers are not turned into page editors.
+for(const tag of ['INPUT','TEXTAREA','SELECT','BODY','SCRIPT','SVG']){const excluded=new El(tag);excluded.textContent='Keep me';pageEvent('pointerdown',excluded);assert.equal(excluded.getAttribute('contenteditable'),null);}
+const existingEditor=new El('DIV');existingEditor.textContent='Existing editor';existingEditor.setAttribute('contenteditable','true');pageEvent('pointerdown',existingEditor);assert.equal(existingEditor.getAttribute('contenteditable'),'true');
+const layout=new El('DIV');layout.append(new El('P'));layout.children[0].textContent='Paragraph';pageEvent('pointerdown',layout);assert.equal(layout.getAttribute('contenteditable'),null);
+// Clear restores the page and annotations together, and undo restores that complete preview.
+const marksBeforeClear=root.texts.children.length;click('action','clear');assert.equal(heading.innerHTML,originalHeading);assert.equal(root.texts.children.length,0);click('action','undo');assert.equal(heading.textContent,'Local preview');assert.equal(root.texts.children.length,marksBeforeClear);
+pageEvent('pointerdown',heading);click('color','#ff263f');click('mode','select');assert.equal(heading.getAttribute('contenteditable'),null);assert.equal(heading.style.getPropertyValue('color'),'#ff263f');
+confirmResult=true;escape();assert.equal(document.documentElement.children.length,0);assert.equal(document.handlers.keydown.length,0);assert.equal(window.handlers.resize.length,0);assert.equal(heading.innerHTML,originalHeading);assert.equal(heading.children[1],emphasis);assert.equal(heading.getAttribute('contenteditable'),null);assert.equal(heading.style.getPropertyValue('outline'),'1px dashed black');assert.equal(heading.style.getPropertyValue('color'),'rgb(20, 30, 40)');for(const event of ['pointerdown','click','auxclick','focusin','input','beforeinput','keyup'])assert.equal(document.handlers[event].length,0);
+console.log('PASS: page editing/styling/focus/undo/clear/restoration/cleanup, text creation/editing/moving/colors/undo/delete, independent grid margins, toolbar dragging/clamping/resize/keyboard, guide placement, shape selection/movement, constrained guides/circles, arrows, colors, cancellation, undo/delete/clear, browse, hiding, cleanup.');
