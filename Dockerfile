@@ -2,6 +2,7 @@ FROM nginxinc/nginx-unprivileged:stable-alpine@sha256:daa17b944bac2b578e962da4c6
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY index.html /srv/index.html
 COPY dist/ /srv/dist/
+COPY assets/ /srv/assets/
 USER 1000:1000
 EXPOSE 8080
 ENTRYPOINT ["nginx"]

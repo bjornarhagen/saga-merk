@@ -13,7 +13,7 @@ try:
         except (OSError, AssertionError):
             if attempt==39: raise
             time.sleep(.25)
-    for url, file in [('/', 'index.html'),('/dist/saga-merk-bookmarklet.txt','dist/saga-merk-bookmarklet.txt'),('/dist/saga-merk.js','dist/saga-merk.js')]:
+    for url, file in [('/', 'index.html'),('/dist/saga-merk-bookmarklet.txt','dist/saga-merk-bookmarklet.txt'),('/dist/saga-merk.js','dist/saga-merk.js')]+[('/'+str(p),str(p)) for p in pathlib.Path('assets').iterdir() if p.is_file()]:
         with urllib.request.urlopen(base+url) as response:
             assert response.read()==pathlib.Path(file).read_bytes(),url
             assert response.headers['X-Content-Type-Options']=='nosniff'

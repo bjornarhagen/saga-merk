@@ -6,7 +6,7 @@ No install dependencies, account, server, or external requests.
 
 ## Install
 
-1. Download this repository and open `index.html` in your regular browser.
+1. Visit https://saga-merk.bjornar.dev, or download this repository and open `index.html` in your regular browser.
 2. Drag **✎ Saga Merk** to your bookmarks bar.
 3. Visit a page and click the bookmark.
 
@@ -62,3 +62,7 @@ Tests exercise interaction logic using a small DOM substitute: drawing, movement
 Annotations are temporary and fixed to the viewport. Refreshing or closing clears them. Browser-internal pages, some PDF viewers, and sites with restrictive security policies may block bookmarklets. Browser bookmark storage and synchronization limits vary.
 
 Saga Merk does not capture screenshots or send page content anywhere; use your normal screenshot tool.
+
+## Website design
+
+The installer shares the blackletter typography, terminal-inspired layout and floral ASCII header artwork of [bjornar.dev](https://bjornar.dev), reused with the owner’s permission. Fonts and header images are served locally from `assets/`. The website supports dark/light themes and respects reduced motion. Website assets are separate from the self-contained bookmarklet.
