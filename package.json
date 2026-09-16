@@ -5,10 +5,13 @@
   "description": "A lightweight browser bookmarklet for visual feedback and layout annotations.",
   "scripts": {
     "build": "node scripts/build.cjs",
-    "test": "node --check src/saga-merk.js && node tests/interactions.cjs",
-    "check": "npm test && npm run build && node tests/bookmarklet.cjs"
+    "test": "node --check src/saga-merk.js && node tests/interactions.cjs && node tests/evergreen.cjs",
+    "check": "npm test && npm run build && node tests/bookmarklet.cjs && MERK_SOURCE=dist/saga-merk.js node tests/interactions.cjs && MERK_SOURCE=dist/saga-merk-evergreen.txt node tests/interactions.cjs"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "terser": "5.48.0"
   }
 }

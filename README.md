@@ -35,7 +35,7 @@ The installer includes a demo. GitHub's file preview does not execute the instal
 - Mirrored guides stay linked at equal offsets from opposite viewport edges. Drag either guide to move the pair; color, width, delete, and undo apply to both.
 - **Text size** defaults to **24 px**, with options of 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 72, and 96 px. It sets the size for new text and counters and resizes a selected text or counter annotation.
 - Pick red, green, blue, or a custom color. A selected mark adopts color changes.
-- **Select** outlines page elements without changing their layout. Floating Move/Edit text/Delete controls appear above, below, or beside the selection. Drag the handle (or use its arrow keys: 10 px, Shift for 1 px). Moving or deleting leaves an invisible, inert copy in the original slot so surrounding content stays in place. The real element moves into the overlay, retaining its DOM identity. Undo, Clear, and closing restore it; hiding the toolbar keeps the preview.
+- **Select** outlines page elements without changing their layout. Floating Move/Edit text/Delete controls appear above, below, or beside the selection. Drag the handle (or use its Alt + arrow keys: 10 px, Shift for 1 px). Moving or deleting leaves an invisible, inert copy in the original slot so surrounding content stays in place. The real element moves into the overlay, retaining its DOM identity. Undo, Clear, and closing restore it; hiding the toolbar keeps the preview.
 - With **Select**, hold **Option/Alt** and drag an element to move it directly, or **Shift-click** to edit its text. Option/Alt takes precedence when both are held.
 - **Edit text** appears when the selected page element contains editable text. Bare labels beside icons are edited separately, preserving the icons. It follows text-only wrappers to the actual text; for a container with several text blocks, it starts with the first eligible block. Click **Done** or elsewhere to finish. The style controls apply to that text while editing, including when you focus the toolbar. Existing form fields and editors keep their normal behavior; use Browse to follow links.
 - Page edits are a temporary local preview. Switching tools or hiding the toolbar keeps them visible. **Undo** reverts edits; **Clear** or closing Saga Merk restores the original page text and styles. Refreshing also discards edits.
@@ -61,6 +61,7 @@ The grid is a visual reference; it does not snap annotations.
 Requires Node.js 18 or newer. No package installation is needed.
 
 ```sh
+npm ci
 npm run check
 ```
 
@@ -80,4 +81,19 @@ Saga Merk does not capture screenshots or send page content anywhere; use your n
 
 The installer shares the blackletter typography, terminal-inspired layout and floral ASCII header artwork of [bjornar.dev](https://bjornar.dev), reused with the owner’s permission. Fonts and header images are served locally from `assets/`. The website supports dark/light themes and respects reduced motion. Website assets are separate from the self-contained bookmarklet.
 
-The build keeps the self-contained bookmarklet URL below Firefox’s 65,536-character bookmark limit and checks that the installer link and manual-install code decode to the exact source. URL-safe punctuation stays literal to avoid unnecessary size growth.
+The build keeps the self-contained bookmarklet URL below Firefox’s 65,536-character bookmark limit and checks that the installer link and manual-install code decode to the exact shipped runtime. URL-safe punctuation stays literal to avoid unnecessary size growth.
+
+## Element inspection and navigation
+
+With Select active, Left selects the previous visible sibling, or the parent if there is no previous sibling. Right enters a wrapper’s first visible child, then advances through siblings and outward to the next element. Text labels and controls stay single navigation stops. Hidden/decorative elements are skipped; moved elements retain their original place in this navigation order.
+
+Up/Down increases/decreases the selected element’s z-index. Static elements become relatively positioned without leaving layout. Layers operate within CSS stacking contexts; moved elements are layered within the floating overlay. Inputs and active text editing keep normal arrow-key behavior. Alt + arrows on the Move handle moves by 10 px; Shift makes that 1 px.
+
+The Element CSS panel shows computed background, text and border colors, text alignment, padding and z-index. Color fields accept CSS colors (including transparent); padding accepts CSS shorthand with units. Changes apply on Enter or blur and support Undo, Clear and close restoration. Border color only appears when the element has a visible border.
+
+## Standalone and Evergreen
+
+- **Standalone** includes the full tool, works without downloading code, and stays on the installed version. Replace the bookmark to update.
+- **Evergreen** downloads the latest release from `https://saga-merk.bjornar.dev/dist/saga-merk.js` each time you open it. If offline, blocked by the page, or unable to load within 3 seconds, it starts its bundled snapshot automatically. It chooses a version before you start editing, and never replaces an active session. Replace the bookmark to refresh its fallback snapshot. Both versions offer the same tools and keep page edits local.
+
+The build uses pinned Terser to minify the runtime; interaction tests run against both source and the shipped code. Install build dependencies with `npm ci`. CI also enforces the Firefox bookmark URL limit.

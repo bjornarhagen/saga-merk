@@ -1,4 +1,6 @@
 (() => {
+  const request=document.currentScript?.dataset.sagaMerkRequest;
+  if(request&&window.__sagaMerkLoading!==request)return;
   const key = '__pageMarkerOverlay';
   if (window[key]) { if(window[key].requestClose)window[key].requestClose();else window[key].remove();return; }
   const host = document.createElement('div');
@@ -16,18 +18,20 @@
     .toolbar-head{display:flex;align-items:center;gap:8px;padding-bottom:16px}.toolbar-head>button:not(.drag-handle){font-size:10px;padding:6px 9px}.tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;padding:1px;margin-bottom:16px;background:#34322e}.tools button{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:11px 12px;font-size:12px;border-color:transparent;text-align:left}.tools button:hover{border-color:#e89a3c}.tools kbd{font-family:inherit;font-size:10px;line-height:1;opacity:.65;border:1px solid currentColor;min-width:19px;text-align:center;padding:1px 3px}
     .settings-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 0;border-top:1px solid #2c2c2c}.row-title{width:42px;flex-shrink:0;color:#e89a3c;font-size:10px;font-weight:400;text-transform:uppercase;letter-spacing:1px}.color-group{display:flex;align-items:center;gap:10px}.setting{display:flex;align-items:center;gap:8px;color:#c5c2bb;font-size:11px}.grid-label{gap:5px}.toolbar-foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-top:12px;border-top:1px solid #2c2c2c}.toolbar-foot button{font-size:11px;padding:6px 10px}.shortcuts{margin-left:auto;color:#a49e92;font-size:10px}.hint{text-align:left;padding:12px 0 0;font-size:10px;line-height:1.6;color:#a49e92}
     .toolbar-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 12px}.toolbar-meta .hint{flex:1;min-width:180px}.website-link{padding-top:12px;color:#e89a3c;font-size:10px;text-decoration:none;white-space:nowrap}.website-link:hover{color:#e8e6e1;text-decoration:underline;text-underline-offset:3px}
+    .inspector{border-top:1px solid #2c2c2c;padding:12px 0}.inspector[hidden]{display:none}.inspector-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px;color:#e89a3c;font-size:10px}.element-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.css-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.css-fields label{display:flex;flex-direction:column;gap:5px;font-size:10px;color:#c5c2bb}.css-fields input,.css-fields select{width:100%;min-width:0;padding:7px;background:#0a0a0a;border:1px solid #34322e;color:#e8e6e1}.css-fields input:invalid{border-color:#ff263f}.inspector-help{font-size:10px;color:#a49e92;margin-top:10px;line-height:1.5}@media(max-width:560px){.css-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
     .bar.page-mode .line-setting{display:none}
     @media(max-width:560px){.bar{padding:12px}.tools button{padding:10px 7px;font-size:11px}.settings-row{gap:10px}.row-title{width:100%}.drag-note{display:none}.shortcuts{width:100%;margin:4px 0 0;font-size:9px}.toolbar-meta .hint{min-width:100%}}
     @media(prefers-reduced-motion:reduce){button,.dimensions{transition:none}}
     .texts{position:absolute;inset:0;pointer-events:none}.textbox{position:absolute;width:240px;max-width:calc(100vw - 24px);padding:3px;border:1px solid transparent;border-radius:4px;background:transparent;pointer-events:auto;cursor:grab;touch-action:none}.textbox:active{cursor:grabbing}.textbox.selected{border-color:#60a5fa}.textbox textarea{display:block;box-sizing:border-box;width:100%;min-height:32px;padding:3px;border:0;outline:none;background:transparent;color:inherit;font:500 24px/1.4 system-ui;resize:none;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;pointer-events:none}.textbox.editing{cursor:text}.textbox.editing textarea{pointer-events:auto;cursor:text;touch-action:auto}.texts.pass,.texts.pass *{pointer-events:none!important}.texts.clean .textbox{border-color:transparent}.texts.clean textarea{outline:none}
     .textbox.badge{display:flex;align-items:center;justify-content:center;aspect-ratio:1;border-radius:50%;max-width:none}.textbox.badge textarea{padding:0;min-height:0;text-align:center;white-space:nowrap;overflow-wrap:normal}
-    .page-outline{position:fixed;border:2px solid #60a5fa;pointer-events:none;z-index:1}.page-controls{position:fixed;display:flex;gap:4px;padding:4px;border:1px solid #514d45;border-radius:0;background:#111;color:#e8e6e1;box-shadow:0 3px 12px #0004;pointer-events:auto;font:12px ui-monospace,monospace;z-index:2}.page-controls button{padding:6px 9px}.page-controls [data-page-drag]{cursor:grab;touch-action:none}.page-controls [data-page-drag]:active{cursor:grabbing}.page-floats{position:absolute;inset:0;pointer-events:none}.page-float{position:fixed;pointer-events:auto}.page-outline[hidden],.page-controls[hidden],.page-float[hidden]{display:none}.bar{z-index:3}
+    .page-outline{position:fixed;border:2px solid #60a5fa;pointer-events:none;z-index:1}.page-controls{position:fixed;display:flex;gap:4px;padding:4px;border:1px solid #514d45;border-radius:0;background:#111;color:#e8e6e1;box-shadow:0 3px 12px #0004;pointer-events:auto;font:12px ui-monospace,monospace;z-index:2}.page-controls button{padding:6px 9px}.page-controls [data-page-drag]{cursor:grab;touch-action:none}.page-controls [data-page-drag]:active{cursor:grabbing}.page-floats{position:absolute;inset:0;pointer-events:none;z-index:0}.page-float{position:fixed;pointer-events:auto}.page-outline[hidden],.page-controls[hidden],.page-float[hidden]{display:none}.bar{z-index:3}
     .hit{pointer-events:stroke;cursor:grab}.ink,.selection{pointer-events:none}.selection{stroke:#fff;stroke-dasharray:4 4;filter:drop-shadow(0 0 1px #000)}svg.pass,svg.pass *{pointer-events:none!important}svg.select{cursor:default;pointer-events:none}svg.dragging,svg.dragging .hit{cursor:grabbing}svg.clean .selection{display:none}
-    </style><div class="page-floats"></div><div class="page-outline" hidden aria-hidden="true"></div><div class="page-controls" hidden role="group" aria-label="Selected page element"><button data-page-drag aria-label="Move selected page element" title="Drag to move; arrow keys move 10 px, Shift for 1 px">⠿ Move</button><button data-page-edit aria-label="Edit selected element text">Edit text</button><button data-page-delete aria-label="Delete selected page element">Delete</button></div><div class="grid" hidden aria-hidden="true"></div><svg xmlns="http://www.w3.org/2000/svg"></svg><div class="texts"></div><div class="dimensions" aria-hidden="true"><span class="dimension dimension-width"></span><span class="dimension dimension-height"></span></div><div class="bar" role="toolbar" aria-label="Page drawing tools">
+    </style><div class="page-floats"></div><div class="page-outline" hidden aria-hidden="true"></div><div class="page-controls" hidden role="group" aria-label="Selected page element"><button data-page-drag aria-label="Move selected page element" title="Drag to move; Alt + arrow keys move 10 px, Shift for 1 px">⠿ Move</button><button data-page-edit aria-label="Edit selected element text">Edit text</button><button data-page-delete aria-label="Delete selected page element">Delete</button></div><div class="grid" hidden aria-hidden="true"></div><svg xmlns="http://www.w3.org/2000/svg"></svg><div class="texts"></div><div class="dimensions" aria-hidden="true"><span class="dimension dimension-width"></span><span class="dimension dimension-height"></span></div><div class="bar" role="toolbar" aria-label="Page drawing tools">
     <div class="toolbar-head"><button class="drag-handle" title="Drag to move the toolbar; arrow keys also move it" aria-label="Move toolbar"><span class="grip" aria-hidden="true">⠿</span><span class="brand">SAGA <span>/</span> MERK</span><span class="drag-note">Drag to move</span></button><button data-action="hide">Hide toolbar</button><button data-action="close" aria-label="Close drawing tools">✕</button></div>
     <div class="tools" role="group" aria-label="Drawing tools"><button data-mode="select" title="Select a mark or page element; Alt/Option-drag to move, Shift-click to edit text (1)" aria-keyshortcuts="1">↖ Select<kbd aria-hidden="true">1</kbd></button><button data-mode="counter" title="Place the next number; Shift for a badge; Alt/Option for sub-counter (2)" aria-keyshortcuts="2"># Counter<kbd aria-hidden="true">2</kbd></button><button data-mode="text" title="Click the page to add editable text (3)" aria-keyshortcuts="3">T Text<kbd aria-hidden="true">3</kbd></button><button data-mode="h" title="Click or drag a horizontal guide; Alt/Option mirrors it (4)" aria-keyshortcuts="4">─ Horizontal<kbd aria-hidden="true">4</kbd></button><button data-mode="v" title="Click or drag a vertical guide; Alt/Option mirrors it (5)" aria-keyshortcuts="5">│ Vertical<kbd aria-hidden="true">5</kbd></button><button data-mode="arrow" title="Drag an arrow; Shift to snap direction (6)" aria-keyshortcuts="6">↗ Arrow<kbd aria-hidden="true">6</kbd></button><button data-mode="rect" title="Drag a rectangle; Shift for a square; Alt/Option from center (7)" aria-keyshortcuts="7">▭ Rectangle<kbd aria-hidden="true">7</kbd></button><button data-mode="circle" title="Drag an oval; Shift for a circle; Alt/Option from center (8)" aria-keyshortcuts="8">○ Circle<kbd aria-hidden="true">8</kbd></button><button data-mode="browse" title="Interact with the underlying page (9)" aria-keyshortcuts="9">Browse<kbd aria-hidden="true">9</kbd></button></div>
     <div class="settings-row"><span class="row-title">Style</span><div class="color-group"><button class="swatch" style="--color:#ff263f" data-color="#ff263f" aria-label="Red" title="Red"></button><button class="swatch" style="--color:#16a34a" data-color="#16a34a" aria-label="Green" title="Green"></button><button class="swatch" style="--color:#2563eb" data-color="#2563eb" aria-label="Blue" title="Blue"></button><input type="color" value="#ff263f" aria-label="Drawing color"></div><label class="setting line-setting">Line width <select aria-label="Stroke width"><option value="1">1 px</option><option value="2" selected>2 px</option><option value="4">4 px</option><option value="6">6 px</option></select></label><label class="setting">Text size <select data-text-size aria-label="Text size"><option value="8">8 px</option><option value="10">10 px</option><option value="12">12 px</option><option value="14">14 px</option><option value="16">16 px</option><option value="18">18 px</option><option value="20">20 px</option><option value="24" selected>24 px</option><option value="28">28 px</option><option value="32">32 px</option><option value="40">40 px</option><option value="48">48 px</option><option value="64">64 px</option><option value="72">72 px</option><option value="96">96 px</option></select></label></div>
     <div class="settings-row"><span class="row-title">Grid</span><button data-action="grid" aria-pressed="false" title="Show or hide the alignment grid">Grid</button><label class="grid-label">Spacing <select data-grid-spacing aria-label="Grid spacing"><option value="8">8 px</option><option value="16">16 px</option><option value="24">24 px</option><option value="32" selected>32 px</option><option value="64">64 px</option><option value="128">128 px</option></select></label><label class="grid-label" title="Inset from the left and right edges">Left/right <input class="margin" data-grid-margin-x type="number" min="0" step="8" value="16" aria-label="Horizontal grid margin in pixels"> px</label><label class="grid-label" title="Inset from the top and bottom edges">Top/bottom <input class="margin" data-grid-margin-y type="number" min="0" step="8" value="16" aria-label="Vertical grid margin in pixels"> px</label></div>
+    <section class="inspector" hidden aria-label="Selected element styles"><div class="inspector-head"><span class="element-name"></span><span>ELEMENT CSS</span></div><div class="css-fields"><label>Background<input data-css="background-color" aria-label="Element background color" spellcheck="false"></label><label>Text color<input data-css="color" aria-label="Element text color" spellcheck="false"></label><label>Border color<input data-css="border-color" aria-label="Element border color" spellcheck="false"></label><label>Text alignment<select data-css="text-align" aria-label="Element text alignment"><option>start</option><option>left</option><option>center</option><option>right</option><option>end</option><option>justify</option></select></label><label>Padding<input data-css="padding" aria-label="Element padding" placeholder="e.g. 8px 16px" spellcheck="false"></label><label>Layer<input data-css="z-index" aria-label="Element z-index" placeholder="auto" spellcheck="false"></label></div><div class="inspector-help">← → select nearby elements · ↑ ↓ change layer<br>Colors accept hex, rgb or transparent. Padding accepts CSS units. Layers stay within their stacking context.</div></section>
     <div class="toolbar-foot"><button data-action="undo">Undo</button><button data-action="delete">Delete</button><button data-action="clear">Clear</button><span class="shortcuts">1–9 tools · H hide / show · Esc close</span></div><div class="toolbar-meta"><div class="hint">Drag marks to move · Double-click text to edit · Shift for fine adjustments</div><a class="website-link" href="https://saga-merk.bjornar.dev/" target="_blank" rel="noopener noreferrer" aria-label="Saga Merk website (opens in a new tab)">saga-merk.bjornar.dev ↗</a></div></div>`;
   const svg = root.querySelector('svg'), bar = root.querySelector('.bar');
   const textLayer = root.querySelector('.texts'), textNodes = new Map();
@@ -42,7 +46,7 @@
   const pageOriginals = new Map();
   const hint = root.querySelector('.hint');
   const defaultHint = hint.textContent;
-  const toolHints={select:'Alt/Option + drag: move element · Shift + click: edit text · Delete keeps its layout space',v:'Alt/Option: mirrored guide at the opposite edge',h:'Alt/Option: mirrored guide at the opposite edge',circle:'Shift: circle · Alt/Option: draw from center · Combine both',rect:'Shift: square · Alt/Option: draw from center · Combine both',counter:'Shift: filled circle with white number · Alt/Option: sub-counter · Combine both'};
+  const toolHints={select:'Alt/Option + drag: move · Shift + click: edit text · ← → select · ↑ ↓ layer',v:'Alt/Option: mirrored guide at the opposite edge',h:'Alt/Option: mirrored guide at the opposite edge',circle:'Shift: circle · Alt/Option: draw from center · Combine both',rect:'Shift: square · Alt/Option: draw from center · Combine both',counter:'Shift: filled circle with white number · Alt/Option: sub-counter · Combine both'};
   const currentSizeOption = document.createElement('option');
   currentSizeOption.hidden=true;textSizeInput.append(currentSizeOption);
   function pushHistory(entry){history.push(entry);if(history.length>100)history.shift();}
@@ -51,8 +55,9 @@
   // Keep the original nodes so undo preserves descendant identity and event listeners.
   function captureTree(el){return {el,data:el.nodeType===3||el.nodeType===8?el.data:null,children:[...el.childNodes].map(captureTree)};}
   function restoreTree(tree){if(tree.data!==null)tree.el.data=tree.data;else{const children=tree.children.map(child=>child.el);if(children.length!==tree.el.childNodes.length||children.some((child,i)=>child!==tree.el.childNodes[i]))tree.el.replaceChildren(...children);tree.children.forEach(restoreTree);}}
-  function capturePage(el){return {tree:captureTree(el),html:el.innerHTML,color:readStyle(el,'color'),fontSize:readStyle(el,'font-size')};}
-  function restorePage(el,state){restoreTree(state.tree);restoreStyle(el,'color',state.color);restoreStyle(el,'font-size',state.fontSize);}
+  const extraCSS=['background-color','border-color','text-align','padding','position','z-index'];
+  function capturePage(el){return {css:extraCSS.map(name=>[name,readStyle(el,name)]),tree:captureTree(el),html:el.innerHTML,color:readStyle(el,'color'),fontSize:readStyle(el,'font-size')};}
+  function restorePage(el,state){restoreTree(state.tree);restoreStyle(el,'color',state.color);restoreStyle(el,'font-size',state.fontSize);for(const [name,value] of state.css)restoreStyle(el,name,value);syncPageLayer(el);}
   function commitPage(){
     if(!pageEdit)return;
     const {el,before}=pageEdit,after=capturePage(el);
@@ -91,7 +96,7 @@
   function rememberPageOriginal(el){
     if(pageOriginals.has(el))return;
     const original=capturePage(el),moved=[...pageMoves.values()].flatMap(m=>m.styles).find(item=>item.node===el);
-    if(moved){const source=document.createElement('div');if(moved.original!==null)source.setAttribute('style',moved.original);original.color=readStyle(source,'color');original.fontSize=readStyle(source,'font-size');}
+    if(moved){const source=document.createElement('div');if(moved.original!==null)source.setAttribute('style',moved.original);original.color=readStyle(source,'color');original.fontSize=readStyle(source,'font-size');original.css=extraCSS.map(name=>[name,readStyle(source,name)]);}
     pageOriginals.set(el,original);
   }
   function startPageEdit(){
@@ -129,7 +134,47 @@
   }
 
   const pageOutline=root.querySelector('.page-outline'),pageControls=root.querySelector('.page-controls'),pageGrip=root.querySelector('[data-page-drag]'),pageDelete=root.querySelector('[data-page-delete]'),pageTextEdit=root.querySelector('[data-page-edit]'),pageFloatLayer=root.querySelector('.page-floats');
+  const inspector=root.querySelector('.inspector'),elementName=root.querySelector('.element-name'),cssInputs=[...root.querySelectorAll('[data-css]')];
   const pageMoves=new Map();
+  function syncInspector(){
+    inspector.hidden=mode!=='select'||!selectedPage;if(inspector.hidden)return;
+    elementName.textContent=selectedPage.tagName.toLowerCase()+(selectedPage.id?'#'+selectedPage.id:typeof selectedPage.className==='string'&&selectedPage.className.trim()?'.'+selectedPage.className.trim().split(/\s+/).slice(0,2).join('.'): '');
+    const style=window.getComputedStyle(selectedPage);
+    for(const input of cssInputs)if(root.activeElement!==input){input.value=style.getPropertyValue(input.dataset.css);input.setCustomValidity('');}
+  }
+  function syncPageLayer(el){const m=pageMoves.get(el);if(m)m.frame.style.zIndex=window.getComputedStyle(el).zIndex;}
+  function setElementCSS(name,value){
+    if(!selectedPage)return;endPageEdit();const el=selectedPage,before=capturePage(el);rememberPageOriginal(el);
+    if(name==='z-index'&&window.getComputedStyle(el).position==='static')el.style.setProperty('position','relative','important');
+    el.style.setProperty(name,value,'important');syncPageLayer(el);pushHistory(()=>restorePage(el,before));render();
+  }
+  for(const input of cssInputs)input.addEventListener('change',()=>{
+    const value=input.value.trim();if(!value||!CSS.supports(input.dataset.css,value)){input.setCustomValidity('Enter a valid CSS value');input.reportValidity();return;}
+    input.setCustomValidity('');setElementCSS(input.dataset.css,value);
+  });
+  // Use original slots when elements have been lifted into the overlay.
+  function sourceSlot(el){return pageMoves.get(el)?.placeholder||el;}
+  function visiblePageNode(el){
+    if(!el||el===host||['HTML','BODY','SCRIPT','STYLE','LINK','META','HEAD','BR'].includes(el.tagName))return false;
+    const style=window.getComputedStyle(el),r=el.getBoundingClientRect();
+    return el.getAttribute('aria-hidden')!=='true'&&style.display!=='none'&&style.visibility!=='hidden'&&(r.width>0||r.height>0);
+  }
+  function pageChildren(parent){return [...(parent?.children||[])].map(el=>[...pageMoves.values()].find(m=>m.placeholder===el)?.el||el).filter(el=>!pageMoves.get(el)?.deleted&&visiblePageNode(el));}
+  function navigatePage(direction){
+    if(!selectedPage)return;endPageEdit();const el=selectedPage,slot=sourceSlot(el),parent=slot.parentElement||slot.parentNode,siblings=pageChildren(parent),index=siblings.indexOf(el);
+    let next;
+    if(direction<0)next=siblings[index-1]||(visiblePageNode(parent)?parent:null);
+    else{
+      const hasText=[...el.childNodes].some(n=>n.nodeType===3&&n.data.trim());
+      // Text and controls are single stops; wrappers expose their children.
+      if(!hasText&&!['A','BUTTON','INPUT','TEXTAREA','SELECT'].includes(el.tagName))next=pageChildren(el)[0];
+      let current=el;
+      while(!next&&current){const original=sourceSlot(current),p=original.parentElement||original.parentNode,list=pageChildren(p);next=list[list.indexOf(current)+1];current=visiblePageNode(p)?p:null;}
+    }
+    if(next)selectPage(next);
+  }
+  function changePageLayer(delta){const value=parseInt(window.getComputedStyle(selectedPage).zIndex,10)||0;setElementCSS('z-index',String(value+delta));}
+
   let selectedPage=null,pageDrag=null;
   const selectionObserver=typeof ResizeObserver==='function'?new ResizeObserver(updatePageSelection):null;
   function selectPage(el){endPageEdit();selectedPage=el;selected=null;selectionObserver?.disconnect();if(el)selectionObserver?.observe(el);render();}
@@ -137,7 +182,7 @@
   function updatePageSelection(){
     if(selectedPage&&!selectedPage.isConnected){selectedPage=null;selectionObserver?.disconnect();}
     const visible=mode==='select'&&selectedPage?.isConnected&&!pageMoves.get(selectedPage)?.deleted;
-    pageOutline.hidden=pageControls.hidden=!visible;
+    pageOutline.hidden=pageControls.hidden=!visible;syncInspector();
     if(!visible)return;
     pageTextEdit.hidden=!pageEdit&&!editableTextTarget(selectedPage);pageTextEdit.textContent=pageEdit?'Done':'Edit text';pageTextEdit.setAttribute('aria-label',pageEdit?'Finish editing text':'Edit selected element text');
     const r=selectedPage.getBoundingClientRect();
@@ -176,7 +221,7 @@
     for(const item of styles){item.node.setAttribute('data-merk-moved-node',item.id);for(const [name,value] of item.values)item.node.style.setProperty(name,value,'important');}
     const overrides={position:'relative',top:'auto',right:'auto',bottom:'auto',left:'auto',margin:'0',width:`${rect.width}px`,height:`${rect.height}px`,'min-width':'0','max-width':'none','min-height':'0','max-height':'none','box-sizing':'border-box',transform:'none',translate:'none',rotate:'none',scale:'none',animation:'none',transition:'none',float:'none',display:window.getComputedStyle(placeholder).display==='inline'?'inline-block':window.getComputedStyle(placeholder).display};
     for(const [name,value] of Object.entries(overrides))el.style.setProperty(name,value,'important');
-    const m={el,placeholder,parent,next,styles,frame,x:rect.left,y:rect.top,deleted:false};pageMoves.set(el,m);applyPageMove(m);return m;
+    const m={el,placeholder,parent,next,styles,frame,x:rect.left,y:rect.top,deleted:false};pageMoves.set(el,m);syncPageLayer(el);applyPageMove(m);return m;
   }
   function applyPageMove(m){m.frame.style.left=`${m.x}px`;m.frame.style.top=`${m.y}px`;m.frame.hidden=m.deleted;updatePageSelection();}
   function restorePageElement(el){
@@ -210,7 +255,7 @@
   pageGrip.addEventListener('pointercancel',cancelPageDrag);
   pageGrip.addEventListener('lostpointercapture',cancelPageDrag);
   pageGrip.addEventListener('keydown',e=>{
-    const delta={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!delta||!selectedPage)return;e.preventDefault();e.stopPropagation();
+    const delta={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!delta||!selectedPage||!e.altKey)return;e.preventDefault();e.stopPropagation();
     endPageEdit();const el=selectedPage,before=pageMoveState(el),m=floatPageElement(el),step=e.shiftKey?1:10;m.x+=delta[0]*step;m.y+=delta[1]*step;applyPageMove(m);pushHistory(()=>applyPageMoveState(el,before));render();
   });
   function deletePageSelection(){
@@ -333,7 +378,8 @@
     if(e.key==='Escape'){e.preventDefault();e.stopPropagation();if(!e.repeat)requestClose();return;}
     const target=e.composedPath()[0]; if(target && (['INPUT','TEXTAREA','SELECT'].includes(target.tagName)||target.isContentEditable)) return;
     let handled=true;
-    if(toolKeys[e.key]&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&!e.shiftKey){cancel();if(bar.classList.contains('hidden'))hideToolbar();setMode(toolKeys[e.key]);}
+    if(selectedPage&&target!==handle&&mode==='select'&&!pageEdit&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){if(e.key==='ArrowLeft'||e.key==='ArrowRight')navigatePage(e.key==='ArrowRight'?1:-1);else changePageLayer(e.key==='ArrowUp'?1:-1);}
+    else if(toolKeys[e.key]&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&!e.shiftKey){cancel();if(bar.classList.contains('hidden'))hideToolbar();setMode(toolKeys[e.key]);}
     else if(e.key.toLowerCase()==='h'&&!e.metaKey&&!e.ctrlKey&&!e.altKey)hideToolbar();
     else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&mode!=='browse')undo();
     else if((e.key==='Delete'||e.key==='Backspace')&&(selected!==null||selectedPage)&&mode!=='browse')deleteSelected();
